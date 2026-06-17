@@ -2,13 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/.next",
   "framework": "nextjs",
-  "installCommand": "npm install && cd frontend && npm install",
-  "env": {
-    "NEXT_PUBLIC_GENLAYER_RPC_URL": "@genlayer-rpc-url",
-    "NEXT_PUBLIC_GENLAYER_CHAIN_ID": "@genlayer-chain-id",
-    "NEXT_PUBLIC_GENLAYER_CHAIN_NAME": "@genlayer-chain-name",
-    "NEXT_PUBLIC_GENLAYER_SYMBOL": "@genlayer-symbol",
-    "NEXT_PUBLIC_GENLAYER_EXPLORER": "@genlayer-explorer",
-    "NEXT_PUBLIC_CONTRACT_ADDRESS": "@contract-address"
-  }
+  "installCommand": "npm install && cd frontend && npm install"
 }
