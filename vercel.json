@@ -1,7 +1,8 @@
 {
-  "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "outputDirectory": "frontend/.next",
+  "framework": "nextjs",
+  "installCommand": "npm install && cd frontend && npm install",
   "env": {
     "NEXT_PUBLIC_GENLAYER_RPC_URL": "@genlayer-rpc-url",
     "NEXT_PUBLIC_GENLAYER_CHAIN_ID": "@genlayer-chain-id",
