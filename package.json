@@ -1,0 +1,26 @@
+{
+  "name": "decentralized-fact-check-protocol",
+  "version": "1.0.0",
+  "description": "Decentralized Fact-Check Protocol powered by GenLayer AI Validators",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "lint": "cd frontend && npm run lint",
+    "deploy": "genlayer deploy --contract contracts/fact_check.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhozil/decentralized-fact-check-protocol"
+  },
+  "keywords": [
+    "genlayer",
+    "fact-check",
+    "blockchain",
+    "ai",
+    "decentralized"
+  ],
+  "author": "",
+  "license": "MIT"
+}

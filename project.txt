@@ -1,0 +1,107 @@
+Decentralized Fact-Check Protocol
+Project GenLayer — Penjelasan Detail
+ Konsep Singkat
+Bayangin Wikipedia + Snopes + Blockchain digabung, tapi yang “ngecek” bukan manusia —
+melainkan AI validator yang saling cross-check secara on-chain.
+Siapapun bisa submit klaim berita/informasi → sistem otomatis cari bukti dari berbagai
+sumber → output verdict yang transparan, permanen, dan anti-manipulasi.
+ Alur Kerja (Step by Step)
+User submit klaim
+ ↓
+Contract crawl sumber berita
+ ↓
+LLM analisis & beri verdict
+ ↓
+Validator nodes cross-check (Optimistic Democracy)
+ ↓
+Verdict final tersimpan on-chain selamanya
+ Detail Tiap Step
+Step 1 — User Submit Klaim
+Input:
+- Teks klaim: "Pemerintah Indonesia resmi larang crypto pada 2025"
+- (Optional) URL sumber asli
+- Staking sejumlah token sebagai "submission fee"
+Step 2 — Contract Crawl Sumber
+Contract pakai gl.get_webpage() untuk scrape beberapa sumber sekaligus:
+sources = [
+ "https://google.com/search?q=Indonesia+crypto+ban+2025",
+ "https://reuters.com/search?q=Indonesia+crypto",
+ "https://coindesk.com/tag/indonesia",
+ # + sumber lokal: kompas, detik, bisnis.com
+]
+for url in sources:
+ data = gl.get_webpage(url)
+ evidence.append(data)
+Step 3 — LLM Analisis
+Semua data dikirim ke gl.exec_prompt() :
+prompt = f"""
+Klaim: "{claim}"
+Bukti dari berbagai sumber:
+{evidence}
+Analisis:
+1. Apakah klaim ini BENAR, SALAH, atau TIDAK BISA DIVERIFIKASI?
+2. Seberapa kuat buktinya? (0-100)
+3. Ringkasan alasan singkat
+4. Sumber mana yang paling relevan?
+Jawab dalam format JSON.
+"""
+result = gl.exec_prompt(prompt)
+Step 4 — Optimistic Democracy Consensus
+Ini yang bikin GenLayer beda dari AI biasa:
+Validator 1 → crawl sumber → LLM → verdict: "SALAH" (confidence 87%)
+Validator 2 → crawl sumber → LLM → verdict: "SALAH" (confidence 91%)
+Validator 3 → crawl sumber → LLM → verdict: "SALAH" (confidence 79%)
+ ↓
+ Majority agree = FINAL VERDICT
+Kalau ada validator yang hasilnya beda jauh → otomatis di-flag untuk re-check. Tidak ada
+single point of failure atau manipulasi.
+Step 5 — Output Tersimpan On-Chain
+ Arsitektur Sistem
+┌─────────────────────────────────────────┐
+│ FRONTEND (Web App) │
+│ - Form submit klaim │
+│ - Explorer semua verdict │
+│ - Search by topic/keyword │
+└────────────────┬────────────────────────┘
+ │ MetaMask TX
+┌────────────────▼────────────────────────┐
+│ GENLAYER SMART CONTRACT │
+│ │
+│ factCheck(claim, sources[]) │
+│ ├── get_webpage() × N sources │
+│ ├── exec_prompt() → analyze │
+│ └── store verdict on-chain │
+└────────────────┬────────────────────────┘
+ │ Optimistic Democracy
+┌────────────────▼────────────────────────┐
+│ VALIDATOR NETWORK │
+│ Node 1 ──┐ │
+│ Node 2 ──┼──► Consensus → Final TX │
+│ Node 3 ──┘ │
+└─────────────────────────────────────────┘
+{
+ "claim": "Pemerintah Indonesia resmi larang crypto pada 2025",
+ "verdict": "FALSE",
+ "confidence": 85,
+ "sources_checked": 6,
+ "reasoning": "Tidak ditemukan regulasi resmi pelarangan. OJK justru merilis framework legal "timestamp": 1749823201,
+ "tx_hash": "0xabc..."
+}
+ Tokenomics Sederhana
+Aksi Token Flow
+Submit klaim User bayar X token
+Verdict = valid submission Sebagian fee ke submitter balik
+Challenge verdict Challenger stake token
+Challenge berhasil Challenger dapat reward
+Challenge gagal Token challenger terpotong
+Ini bikin orang mikir dua kali sebelum submit hoax atau challenge verdict valid.
+ Kenapa Harus GenLayer?
+Solusi Lain Masalah
+Snopes/manual fact-checker Lambat, bisa bias, bisa disuap
+Chainlink Oracle Cuma fetch data mentah, ga bisa reasoning
+GPT biasa Ga ada konsensus, bisa dimanipulasi, ga permanen
+GenLayer Real-time web access + AI reasoning + consensus
+ Fitur Tambahan yang Bisa Dibangun
+
+API publik — media/developer bisa integrate
+Dibuat untuk GenLayer Testnet Bradbury
