@@ -37,7 +37,14 @@ export default function ExplorerPage() {
   const [challengeModal, setChallengeModal] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [walletProvider, setWalletProvider] = useState<any>(null);
-  const [client] = useState<FactCheckClient>(() => new FactCheckClient());
+  const [client, setClient] = useState<FactCheckClient>(() => new FactCheckClient());
+
+  useEffect(() => {
+    if (walletAddress) {
+      const c = new FactCheckClient(walletAddress);
+      setClient(c);
+    }
+  }, [walletAddress]);
 
   const fetchData = useCallback(async () => {
     try {

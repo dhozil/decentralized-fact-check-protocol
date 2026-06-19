@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Masthead from "@/components/Masthead";
 import Footer from "@/components/Footer";
@@ -17,7 +17,14 @@ export default function SubmitPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [walletProvider, setWalletProvider] = useState<any>(null);
-  const [client] = useState<FactCheckClient>(() => new FactCheckClient());
+  const [client, setClient] = useState<FactCheckClient>(() => new FactCheckClient());
+
+  useEffect(() => {
+    if (walletAddress) {
+      const c = new FactCheckClient(walletAddress);
+      setClient(c);
+    }
+  }, [walletAddress]);
 
   const categories = getCategories();
 
