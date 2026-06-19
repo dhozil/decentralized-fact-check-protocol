@@ -1,10 +1,10 @@
-import { createClient, createAccount } from "genlayer-js";
+import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 import type { Claim, Challenge, UserProfile, LeaderboardEntry, Stats, TransactionResult } from "./types";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` || "0x00E4b2FA5d63D03462a1857F2D7D4B8e1452c6e3";
 
-const reader = createClient({ chain: testnetBradbury, account: createAccount() });
+const reader = createClient({ chain: testnetBradbury });
 
 // Rate limiting
 let lastRequestTime = 0;
@@ -50,11 +50,13 @@ class FactCheckClient {
   }
 
   private async getWriteClient(provider: any): Promise<any> {
-    return createClient({
+    const client = createClient({
       chain: testnetBradbury,
       account: this.address as `0x${string}`,
       provider,
     });
+    await client.connect("testnetBradbury");
+    return client;
   }
 
   async getClaims(): Promise<Claim[]> {
