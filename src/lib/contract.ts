@@ -8,7 +8,7 @@ const reader = createClient({ chain: testnetBradbury });
 
 // Rate limiting
 let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 3000; // 3 seconds between requests
+const MIN_REQUEST_INTERVAL = 5000; // 5 seconds between requests
 
 async function rateLimitedCall<T>(fn: () => Promise<T>): Promise<T> {
   const now = Date.now();
@@ -232,8 +232,8 @@ class FactCheckClient {
       });
       await client.waitForTransactionReceipt({
         hash: txHash,
-        retries: 60,
-        interval: 30000,
+        retries: 30,
+        interval: 60000,
       });
       return { success: true, txHash: txHash as string };
     } catch (error) {
@@ -256,8 +256,8 @@ class FactCheckClient {
       });
       await client.waitForTransactionReceipt({
         hash: txHash,
-        retries: 60,
-        interval: 30000,
+        retries: 30,
+        interval: 60000,
       });
       return { success: true, txHash: txHash as string };
     } catch (error) {
