@@ -50,13 +50,11 @@ class FactCheckClient {
   }
 
   private async getWriteClient(provider: any): Promise<any> {
-    const client = createClient({
+    return createClient({
       chain: testnetBradbury,
       account: this.address as `0x${string}`,
       provider,
     });
-    await client.connect("testnetBradbury");
-    return client;
   }
 
   async getClaims(): Promise<Claim[]> {
@@ -216,6 +214,7 @@ class FactCheckClient {
     try {
       const client = await this.getWriteClient(provider);
       const txHash = await client.writeContract({
+        account: this.address as `0x${string}`,
         address: CONTRACT_ADDRESS,
         functionName: "submit_claim",
         args: [claimText, sourceUrl],
@@ -240,6 +239,7 @@ class FactCheckClient {
     try {
       const client = await this.getWriteClient(provider);
       const txHash = await client.writeContract({
+        account: this.address as `0x${string}`,
         address: CONTRACT_ADDRESS,
         functionName: "challenge_claim",
         args: [claimId, reason],
@@ -264,6 +264,7 @@ class FactCheckClient {
     try {
       const client = await this.getWriteClient(provider);
       const txHash = await client.writeContract({
+        account: this.address as `0x${string}`,
         address: CONTRACT_ADDRESS,
         functionName: "withdraw_rewards",
         args: [],
