@@ -8,7 +8,7 @@ const reader = createClient({ chain: testnetBradbury });
 
 // Rate limiting
 let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 1000; // 1 second between requests
+const MIN_REQUEST_INTERVAL = 3000; // 3 seconds between requests
 
 async function rateLimitedCall<T>(fn: () => Promise<T>): Promise<T> {
   const now = Date.now();
@@ -17,7 +17,16 @@ async function rateLimitedCall<T>(fn: () => Promise<T>): Promise<T> {
     await new Promise(resolve => setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest));
   }
   lastRequestTime = Date.now();
-  return fn();
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (error?.message?.includes("rate limit") || error?.message?.includes("LimitExceeded")) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      lastRequestTime = Date.now();
+      return fn();
+    }
+    throw error;
+  }
 }
 
 function weiToGen(wei: number | bigint): number {
@@ -223,8 +232,8 @@ class FactCheckClient {
       });
       await client.waitForTransactionReceipt({
         hash: txHash,
-        retries: 120,
-        interval: 10000,
+        retries: 60,
+        interval: 30000,
       });
       return { success: true, txHash: txHash as string };
     } catch (error) {
@@ -247,8 +256,8 @@ class FactCheckClient {
       });
       await client.waitForTransactionReceipt({
         hash: txHash,
-        retries: 120,
-        interval: 10000,
+        retries: 60,
+        interval: 30000,
       });
       return { success: true, txHash: txHash as string };
     } catch (error) {
