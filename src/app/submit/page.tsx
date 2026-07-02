@@ -51,18 +51,6 @@ export default function SubmitPage() {
       return;
     }
 
-    // Check network
-    try {
-      const chainId = await walletProvider.request({ method: "eth_chainId" });
-      if (chainId !== "0x107D") {
-        showToast({ type: "error", title: "Wrong Network", message: "Please switch to GenLayer Bradbury Testnet (Chain ID: 4221)" });
-        return;
-      }
-    } catch {
-      showToast({ type: "error", title: "Network Error", message: "Failed to check network. Please switch to GenLayer Bradbury Testnet." });
-      return;
-    }
-
     // Check balance
     try {
       const balance = await walletProvider.request({ method: "eth_getBalance", params: [walletAddress, "latest"] });
@@ -81,7 +69,7 @@ export default function SubmitPage() {
     }
 
     setIsSubmitting(true);
-    showToast({ type: "pending", title: "Submitting Claim", message: "Sending transaction... AI consensus may take 1-3 minutes." });
+    showToast({ type: "pending", title: "Submitting Claim", message: "Switching to Bradbury network and sending transaction..." });
 
     try {
       const result = await client.submitClaim(claim, sourceUrl, walletProvider);
