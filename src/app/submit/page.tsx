@@ -51,6 +51,35 @@ export default function SubmitPage() {
       return;
     }
 
+    // Check network
+    try {
+      const chainId = await walletProvider.request({ method: "eth_chainId" });
+      if (chainId !== "0x107D") {
+        showToast({ type: "error", title: "Wrong Network", message: "Please switch to GenLayer Bradbury Testnet (Chain ID: 4221)" });
+        return;
+      }
+    } catch {
+      showToast({ type: "error", title: "Network Error", message: "Failed to check network. Please switch to GenLayer Bradbury Testnet." });
+      return;
+    }
+
+    // Check balance
+    try {
+      const balance = await walletProvider.request({ method: "eth_getBalance", params: [walletAddress, "latest"] });
+      const balanceWei = BigInt(balance);
+      const minRequired = BigInt("2000000000000000000"); // 2 GEN (1 stake + 1 gas)
+      if (balanceWei < minRequired) {
+        showToast({
+          type: "error",
+          title: "Insufficient Balance",
+          message: `You need at least 2 GEN (1 for stake + gas). Get GEN from the faucet.`,
+        });
+        return;
+      }
+    } catch {
+      // Skip balance check if it fails
+    }
+
     setIsSubmitting(true);
     showToast({ type: "pending", title: "Submitting Claim", message: "Sending transaction... AI consensus may take 1-3 minutes." });
 

@@ -63,6 +63,8 @@ export default function Masthead({ onWalletChange, onProviderChange }: MastheadP
       });
       setWalletAddress(accounts[0]);
       onProviderChange?.(window.ethereum);
+      // Auto-switch to Bradbury
+      await switchToBradbury();
     } catch (error) {
       console.error("Failed to connect wallet:", error);
     } finally {
