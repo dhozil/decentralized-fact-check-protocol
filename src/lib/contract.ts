@@ -59,13 +59,32 @@ class FactCheckClient {
   }
 
   private async getWriteClient(provider: any): Promise<any> {
-    const client = createClient({
+    // Switch network first using provider directly
+    try {
+      await provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x107D" }],
+      });
+    } catch (switchError: any) {
+      const code = switchError?.code || switchError?.error?.code;
+      if (code === 4902) {
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x107D",
+            chainName: "GenLayer Bradbury Testnet",
+            nativeCurrency: { name: "GEN", symbol: "GEN", decimals: 18 },
+            rpcUrls: ["https://rpc-bradbury.genlayer.com"],
+            blockExplorerUrls: ["https://explorer-bradbury.genlayer.com"],
+          }],
+        });
+      }
+    }
+    return createClient({
       chain: testnetBradbury,
       account: this.address as `0x${string}`,
       provider,
     });
-    await client.connect("testnetBradbury");
-    return client;
   }
 
   async getClaims(): Promise<Claim[]> {
