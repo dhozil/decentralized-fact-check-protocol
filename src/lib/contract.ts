@@ -236,9 +236,10 @@ class FactCheckClient {
         interval: 60000,
       });
       return { success: true, txHash: txHash as string };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit claim:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+      const msg = error?.message || error?.shortMessage || error?.details || JSON.stringify(error) || "Unknown error";
+      return { success: false, error: msg };
     }
   }
 
@@ -260,9 +261,10 @@ class FactCheckClient {
         interval: 60000,
       });
       return { success: true, txHash: txHash as string };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to challenge claim:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+      const msg = error?.message || error?.shortMessage || error?.details || JSON.stringify(error) || "Unknown error";
+      return { success: false, error: msg };
     }
   }
 
@@ -283,9 +285,10 @@ class FactCheckClient {
         interval: 5000,
       });
       return { success: true, txHash: txHash as string };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to withdraw rewards:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+      const msg = error?.message || error?.shortMessage || error?.details || JSON.stringify(error) || "Unknown error";
+      return { success: false, error: msg };
     }
   }
 }
