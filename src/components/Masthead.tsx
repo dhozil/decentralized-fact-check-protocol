@@ -28,12 +28,14 @@ export default function Masthead({ onWalletChange, onProviderChange }: MastheadP
   const checkConnection = async () => {
     if (typeof window.ethereum === "undefined") return;
     try {
-      const accounts = await window.ethereum.request({
+      const provider = window._activeProvider || window.ethereum;
+      const accounts = await provider.request({
         method: "eth_accounts",
       });
       if (accounts.length > 0) {
         setWalletAddress(accounts[0]);
-        onProviderChange?.(window.ethereum);
+        onProviderChange?.(provider);
+        window._activeProvider = provider;
       }
     } catch (error) {
       console.error("Failed to check connection:", error);
@@ -53,16 +55,23 @@ export default function Masthead({ onWalletChange, onProviderChange }: MastheadP
 
   const connectWallet = async () => {
     if (typeof window.ethereum === "undefined") {
-      alert("Please install MetaMask to use this application");
+      alert("Please install MetaMask or Rabby wallet to use this application");
       return;
     }
     setIsConnecting(true);
     try {
-      const accounts = await window.ethereum.request({
+      // Support multiple providers (MetaMask + Rabby)
+      const provider = window.ethereum.providers?.length
+        ? window.ethereum.providers.find((p: any) => p.isMetaMask || p.isRabby) || window.ethereum.providers[0]
+        : window.ethereum;
+      
+      const accounts = await provider.request({
         method: "eth_requestAccounts",
       });
       setWalletAddress(accounts[0]);
-      onProviderChange?.(window.ethereum);
+      onProviderChange?.(provider);
+      // Store provider reference for switch
+      window._activeProvider = provider;
       // Auto-switch to Bradbury
       await switchToBradbury();
     } catch (error) {
@@ -80,16 +89,20 @@ export default function Masthead({ onWalletChange, onProviderChange }: MastheadP
   };
 
   const switchToBradbury = async () => {
-    if (typeof window.ethereum === "undefined") return;
+    const provider = window._activeProvider || window.ethereum;
+    if (!provider) return;
     try {
-      await window.ethereum.request({
+      // Try to switch first
+      await provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x107D" }],
       });
     } catch (error: any) {
-      if (error.code === 4902) {
+      const code = error?.code || error?.error?.code;
+      // 4902 = chain not added yet, try to add it
+      if (code === 4902 || error?.data?.originalError?.code === 4902) {
         try {
-          await window.ethereum.request({
+          await provider.request({
             method: "wallet_addEthereumChain",
             params: [
               {
@@ -101,9 +114,11 @@ export default function Masthead({ onWalletChange, onProviderChange }: MastheadP
               },
             ],
           });
-        } catch (addError) {
+        } catch (addError: any) {
           console.error("Failed to add chain:", addError);
         }
+      } else {
+        console.error("Failed to switch chain:", error);
       }
     }
   };
